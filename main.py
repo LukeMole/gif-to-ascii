@@ -25,6 +25,7 @@ def create_ascii_frame(img_array):
 def convert_gif_to_ascii(gif_name, img_size):
     all_frames = []
     gif = cv2.VideoCapture(gif_name)
+    fps = gif.get(cv2.CAP_PROP_FPS)
     frames = []
     ret, frame = gif.read()
     #goes through every frame and changes its color, resizes it and appends it to the frames list
@@ -40,13 +41,13 @@ def convert_gif_to_ascii(gif_name, img_size):
         all_frames.append(create_ascii_frame(frame))
 
     #returns a full animation list with complete text based frames
-    return all_frames
+    return {'frames':all_frames,'framerate':fps}
 
 def play_ascii_gif(frames, fps):
     #plays the ASCII gif indefinitely based on the user set FPS
     while True:
         for frame in frames:
-            time.sleep(fps)
+            time.sleep(1/fps)
             os.system('cls' if os.name == 'nt' else 'clear')
             print(frame)
 
@@ -55,13 +56,6 @@ def play_ascii_gif(frames, fps):
 if __name__ == '__main__':
     #input area for gif parameters
     gif_name = input('gif name: ')
-    while True:
-        try:
-            speed = input('fps: ')
-            speed = 1/int(speed)
-            break
-        except ValueError:
-            pass
     gif_size = {'x':64,'y':48}
-    all_frames = convert_gif_to_ascii(gif_name, gif_size)
-    play_ascii_gif(all_frames, speed)
+    gif_data = convert_gif_to_ascii(gif_name, gif_size)
+    play_ascii_gif(gif_data['frames'], gif_data['framerate'])
